@@ -89,7 +89,7 @@ describe UsersController do
         post :create, :user => @attr
         response.should render_template('new')
       end
-
+    end
 
     describe "success" do
 
@@ -124,5 +124,5 @@ describe UsersController do
     end
 
   end
-end
+# end
 end
