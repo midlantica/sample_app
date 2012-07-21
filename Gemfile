@@ -22,12 +22,12 @@ group :test do
 end
 
 
-group :production do
-  gem 'pg'
-end
+# group :production do
+#   gem 'pg'
+# end
 
-group :development, :test do
-  gem 'sqlite3', '1.3.5'
-end
+# group :development, :test do
+#   gem 'sqlite3', '1.3.5'
+# end
 
 
