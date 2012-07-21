@@ -5,7 +5,6 @@ class SessionsController < ApplicationController
   end
 
   def create 
-    # render 'new'
   	user = User.authenticate(params[:session][:email],
                              params[:session][:password])
     if user.nil?
