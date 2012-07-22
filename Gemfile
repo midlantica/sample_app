@@ -3,6 +3,7 @@ source 'http://rubygems.org'
 gem 'rails'
 gem 'sqlite3', '1.3.5'
 gem 'gravatar_image_tag', '1.0.0.pre2'
+gem 'will_paginate'
 
 group :development do
 	gem 'rspec-rails'
