@@ -31,6 +31,7 @@
 
     def test_sign_in(user)
       controller.sign_in(user)
+      # controller.surrent_user = user
     end
 
     def integration_sign_in(user)

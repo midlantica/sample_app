@@ -5,12 +5,13 @@ class UsersController < ApplicationController
 
 	def index 
 		@title = "All users"
-		# @users = User.all
+		@users = User.all
 		@users = User.paginate(:page => params[:page])
 	end
 
 	def show
 		@user = User.find(params[:id])
+		@microposts = @user.microposts.paginate(:page => params[:page])
 		@title = @user.name
 	end
 
@@ -39,7 +40,7 @@ class UsersController < ApplicationController
 	def update
 		@user = User.find(params[:id])
 		if @user.update_attributes(params[:user])
-			flash[:success] = "Profile update."
+			flash[:success] = "Profile updated."
 			redirect_to @user
 		else
 			@title = "Edit user"
@@ -57,9 +58,9 @@ class UsersController < ApplicationController
 
 	private
 
-		def authenticate
-			deny_access unless signed_in?
-		end
+		# def authenticate
+		# 	deny_access unless signed_in?
+		# end
 
 		def correct_user
 			@user = User.find(params[:id])
@@ -67,7 +68,8 @@ class UsersController < ApplicationController
 		end
 
 		def admin_user
-			redirect_to(root_path) unless current_user.admin?
+			return redirect_to(signin_path) unless current_user
+			return redirect_to(root_path) unless current_user.admin?
 		end
 				
 		

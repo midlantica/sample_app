@@ -1,7 +1,8 @@
 require 'spec_helper'
 
 describe UsersController do
-  render_views
+	render_views
+
 
   describe "GET 'index'" do
 
@@ -18,12 +19,12 @@ describe UsersController do
       before(:each) do
         @user = test_sign_in(Factory(:user))
         second = Factory(:user, :name => "Bob", :email => "another@example.com")
-        third = Factory(:user, :name => "Ben", :email => "another@example.net")
+        third  = Factory(:user, :name => "Ben", :email => "another@example.net")
 
         @users = [@user, second, third]
         30.times do
           @users << Factory(:user, :name => Factory.next(:name),
-                            :email => Factory.next(:email))
+                                   :email => Factory.next(:email))
         end
       end
 
@@ -48,13 +49,18 @@ describe UsersController do
         get :index
         response.should have_selector("div.pagination")
         response.should have_selector("span.disabled", :content => "Previous")
-        response.should have_selector("a", :href => "/users?page=2",
+        response.should have_selector("a", :href => "/users?page=2", 
                                            :content => "2")
-        response.should have_selector("a", :href => "/users?page=2",
+        response.should have_selector("a", :href => "/users?page=2", 
                                            :content => "Next")
       end
+
     end
+    # END for signed-in users do
+
   end
+  # END GET index do
+
 
   describe "GET 'show'" do
 
@@ -72,12 +78,13 @@ describe UsersController do
       assigns(:user).should == @user
     end
 
+    # TEST FOR SHOW PAGE
     it "should have the right title" do
       get :show, :id => @user
       response.should have_selector("title", :content => @user.name)
     end
 
-    it "should include the user's name" do
+    it "shoudl include the user's name" do
       get :show, :id => @user
       response.should have_selector("h1", :content => @user.name)
     end
@@ -87,24 +94,17 @@ describe UsersController do
       response.should have_selector("h1>img", :class => "gravatar")
     end
 
-    it "should show the users's microposts" do
-      mp1 = Factory(:micropost, :user => @user, :content => "Foo bar")
-      mp2 = Factory(:micropost, :user => @user, :content => "Baz qux")
-      get :show, :id => @user
-      response.should have_selector("span.content", :content => mp1.content)
-      response.should have_selector("span.content", :content => mp2.content)
-    end
-
   end
+
 
   describe "GET 'new'" do
     it "should be successful" do
-      get 'new'
-      response.should be_success
+    	get :new
+     	response.should be_success
     end
 
     it "should have the right title" do
-      get 'new'
+      get :new
       response.should have_selector("title", :content => "Sign up")
     end
 
@@ -113,29 +113,24 @@ describe UsersController do
       response.should have_selector("input[name='user[name]'][type='text']")
     end
 
-    it "should have an email field" do
-      get :new
-      response.should have_selector("input[name='user[email]'][type='text']")
-    end
+    it "should have an email field"
 
-    it "should have a password field" do
-      get :new
-      response.should have_selector("input[name='user[password]'][type='password']")
-    end
+    it "should have a password field"
 
-    it "should have a password confirmation field" do
-      get :new
-      response.should have_selector("input[name='user[password_confirmation]'][type='password']")
-    end
+    it "should have a password confirmation field"    
+
   end
 
-  describe "POST 'create'" do
 
-    describe "failure" do
+  describe "POST 'create'" do 
 
-      before(:each) do
-        @attr = {:name => "", :email => "", :password => "",
-                 :password_confirmation => ""}
+    describe "failure" do 
+
+      before(:each) do  
+        @attr = { :name => "", 
+                  :email => "", 
+                  :password => "", 
+                  :password_confirmation => "" }
       end
 
       it "should not create a user" do
@@ -155,23 +150,19 @@ describe UsersController do
       end
     end
 
-
     describe "success" do
 
-      before(:each) do
-        @attr = {:name => "New User", :email => "user@example.com",
-                 :password => "foobar", :password_confirmation => "foobar"}
+      before(:each) do  
+        @attr = { :name => "New user",
+                  :email => "user@example.com",
+                  :password => "foobar",
+                  :password_confirmation => "foobar" }
       end
 
       it "should create a user" do
         lambda do
           post :create, :user => @attr
         end.should change(User, :count).by(1)
-      end
-
-      it "should sign the user in" do
-        post :create, :user => @attr
-        controller.should be_signed_in
       end
 
       it "should redirect to the user show page" do
@@ -183,50 +174,60 @@ describe UsersController do
         post :create, :user => @attr
         flash[:success].should =~ /welcome to the sample app/i
       end
-    end
-  end
 
-  describe "GET 'edit'" do
+      it "should sign the user in" do
+        post :create, :user => @attr
+        controller.should be_signed_in
+      end
 
-    before(:each) do
-      @user = Factory(:user)
-      test_sign_in(@user)
     end
 
-    it "should be successful" do
-      get :edit, :id => @user
-      response.should be_success
-    end
 
-    it "should have the right title" do
-      get :edit, :id => @user
-      response.should have_selector("title", :content => "Edit user")
-    end
+    describe "GET 'edit'" do
 
-    it "should have a link to change the Gravatar" do
-      get :edit, :id => @user
-      gravatar_url = "http://gravatar.com/emails"
-      response.should have_selector("a", :href => gravatar_url,
-                                    :content => "change")
-    end
-  end
+      before(:each) do
+        @user = Factory(:user)
+        test_sign_in(@user)
+      end
+
+      it "should be successful" do
+        get :edit, :id => @user
+        response.should be_success
+      end
+
+      it "should have the right title" do
+        get :edit, :id => @user
+        response.should have_selector("title", :content => "Edit user")
+      end
+
+      it "should have a link to change the Gravatar" do
+        get :edit, :id => @user
+        gravatar_url ="http://gravatar.com/emails"
+        response.should have_selector("a", :href => gravatar_url,
+                                           :content => "change")
+      end
+
+    end 
+    #END OF GET EDIT
 
   describe "PUT 'update'" do
+
     before(:each) do
       @user = Factory(:user)
       test_sign_in(@user)
     end
 
     describe "failure" do
+
       before(:each) do
-        @attr = {:email => "", :name => "", :password => "",
-                 :password_confirmation => ""}
+        @attr = { :email => "", :name => "", :password => "", :password_confirmation => "" }
       end
 
       it "should render the 'edit' page" do
         put :update, :id => @user, :user => @attr
         response.should render_template('edit')
       end
+
 
       it "should have the right title" do
         put :update, :id => @user, :user => @attr
@@ -235,13 +236,16 @@ describe UsersController do
     end
 
     describe "success" do
-      before(:each) do
-        @attr = {:name => "New Name", :email => "user@example.org",
-                 :password => "barbaz", :password_confirmation => "barbaz"}
-      end
 
-      it "should change the user's attributes" do
-        put :update, :id => @user, :user => @attr
+      before(:each) do
+        @attr = { :name => "New Name", 
+                  :email => "user@example.org", 
+                  :password => "barbaz", 
+                  :password_confirmation => "barbaz" }
+      end
+      
+      it "should change the users attributes" do
+        put :update, :id => @user, :user => attr
         @user.reload
         @user.name.should == @attr[:name]
         @user.email.should == @attr[:email]
@@ -257,9 +261,13 @@ describe UsersController do
         flash[:success].should =~ /updated/
       end
     end
+
   end
+  # END OF PUT UPDATE do
+
 
   describe "authentication of edit/update pages" do
+
     before(:each) do
       @user = Factory(:user)
     end
@@ -277,7 +285,7 @@ describe UsersController do
       end
     end
 
-    describe "for signed-in users" do
+    describe "for signed in users" do
 
       before(:each) do
         wrong_user = Factory(:user, :email => "user@example.net")
@@ -294,7 +302,10 @@ describe UsersController do
         response.should redirect_to(root_path)
       end
     end
-  end
+
+  end 
+  # END auth of edit/update pgs do
+
 
   describe "DELETE 'destroy'" do
 
@@ -336,4 +347,7 @@ describe UsersController do
       end
     end
   end
+
 end
+
+# end

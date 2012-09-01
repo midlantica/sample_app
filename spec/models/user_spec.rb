@@ -1,14 +1,3 @@
-# == Schema Information
-#
-# Table name: users
-#
-#  id         :integer         not null, primary key
-#  name       :string(255)
-#  email      :string(255)
-#  created_at :datetime
-#  updated_at :datetime
-#
-
 require 'spec_helper'
 
 describe User do
@@ -21,59 +10,59 @@ describe User do
 				}
 	end
 
-	it "should create a new instance given the valid attributes" do
-		User.create!(@attr)
-	end
-
-	it "should require a name" do
-		no_name_user = User.new(@attr.merge(:name => ""))
-		no_name_user.should_not be_valid
-	end
-
-	it "should require an email address" do
-		no_email_user = User.new(@attr.merge(:email => ""))
-		no_email_user.should_not be_valid
-	end
-
-	it "should reject names that are too long" do
-		long_name = "a" * 51
-		long_name_user = User.new(@attr.merge(:name => long_name))
-		long_name_user.should_not be_valid	
-	end
-
-	# Test for email validation
-	it "should accept valid email addresses" do
-		addresses = %w[user@foo.com THE_USER@foo.bar.org first.last@foo.jp]
-		addresses.each do |address|
-			valid_email_user = User.new(@attr.merge(:email => address))
-			valid_email_user.should be_valid
+		it "should create a new instance given the valid attributes" do
+			User.create!(@attr)
 		end
-	end
 
-	it "should reject invalid email addresses" do
-		addresses = %w[user@foo,com user_at_foo.org example.user@foo.]
-		addresses.each do |address|
-			invalid_email_user = User.new(@attr.merge(:email => address))
-			invalid_email_user.should_not be_valid
+		it "should require a name" do
+			no_name_user = User.new(@attr.merge(:name => ""))
+			no_name_user.should_not be_valid
 		end
-	end
 
-	# Uniqueness validation
-	it "should reject duplicate multiple email addresses" do
-		# put a user with given email address into the database
-		User.create!(@attr)
-		user_with_duplicate_email = User.new(@attr)
-		user_with_duplicate_email.should_not be_valid
-	end
+		it "should require an email address" do
+			no_email_user = User.new(@attr.merge(:email => ""))
+			no_email_user.should_not be_valid
+		end
 
-	# duplicate email case insensitive
-	it "should reject email addresses identical up to case" do
-	    upcased_email = @attr[:email].upcase
-	    User.create!(@attr.merge(:email => upcased_email))
-	    user_with_duplicate_email = User.new(@attr)
-	    user_with_duplicate_email.should_not be_valid
-	end
+		it "should reject names that are too long" do
+			long_name = "a" * 51
+			long_name_user = User.new(@attr.merge(:name => long_name))
+			long_name_user.should_not be_valid	
+		end
 
+		# Test for email validation
+		it "should accept valid email addresses" do
+			addresses = %w[user@foo.com THE_USER@foo.bar.org first.last@foo.jp]
+			addresses.each do |address|
+				valid_email_user = User.new(@attr.merge(:email => address))
+				valid_email_user.should be_valid
+			end
+		end
+
+		it "should reject invalid email addresses" do
+			addresses = %w[user@foo,com user_at_foo.org example.user@foo.]
+			addresses.each do |address|
+				invalid_email_user = User.new(@attr.merge(:email => address))
+				invalid_email_user.should_not be_valid
+			end
+		end
+
+		# Uniqueness validation
+		it "should reject duplicate multiple email addresses" do
+			# put a user with given email address into the database
+			User.create!(@attr)
+			user_with_duplicate_email = User.new(@attr)
+			user_with_duplicate_email.should_not be_valid
+		end
+
+		# duplicate email case insensitive
+		it "should reject email addresses identical up to case" do
+		    upcased_email = @attr[:email].upcase
+		    User.create!(@attr.merge(:email => upcased_email))
+		    user_with_duplicate_email = User.new(@attr)
+		    user_with_duplicate_email.should_not be_valid
+		end
+	
 
 	# PASSWORD
 	describe "password validations" do
@@ -102,11 +91,11 @@ describe User do
 	end
 
 
-	# encrypetd password
+	# encrypted password
 	describe "password encryption" do
 
 		before(:each) do
-			@user = User.create!(@attr)
+			@user = User.create(@attr)
 		end	
 
 			it "should have an encrypted password attribute" do
@@ -135,7 +124,7 @@ describe User do
 				wrong_password_user.should be_nil
 			end
 
-			it "shoudl return nil for an email address with no user" do
+			it "should return nil for an email address with no user" do
 				nonexistent_user = User.authenticate("bar@foo.com", @attr[:password])
 				nonexistent_user.should be_nil
 			end
@@ -149,7 +138,9 @@ describe User do
 		describe "admin attribute" do
 
 			before(:each) do
-				@user = User.create!(@attr)
+				@attr[:email]= Factory.next :email
+				@user = User.create(@attr)
+				# puts @user.errors.inspect
 			end
 
 			it "should respond to admin" do
@@ -167,16 +158,32 @@ describe User do
 		
 		end
 		# end admin attr
+	end
+	
+	describe "micropost associations" do
 
+		before(:each) do
+			@user = User.create(@attr)
+			@mp1 = Factory(:micropost, :user => @user, :created_at => 1.day.ago)
+			@mp2 = Factory(:micropost, :user => @user, :created_at => 1.day.ago)
+		end
+
+		it "should have a microposts attribute" do
+			@user.should respond_to(:microposts)
+		end
+
+		it "should have the right microposts in the right order" do
+			@user.microposts.should == [@mp2, @mp1]
+		end
+
+		it "should destroy associated microposts" do
+			@user.destroy
+			[@mp1, @mp2].each do |micropost|
+				Micropost.find_by_id(micropost.id).should be_nil
+			end
+		end
 
 	end
 
 end
-
-
-
-
-
-
-
-
+# end

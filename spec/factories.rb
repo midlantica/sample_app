@@ -7,9 +7,14 @@ Factory.define :user do |user|
 end
 
 Factory.sequence :name do |n|
-	"person #{n}"
+	"Person #{n}"
 end
 
 Factory.sequence :email do |n|
-	"person-{n}@example.com"
+	"person-#{n}@example.com"
+end
+
+Factory.define :micropost do |micropost|
+	micropost.content "Foo bar"
+	micropost.association :user
 end
